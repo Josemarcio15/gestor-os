@@ -24,6 +24,9 @@ export async function POST({ request }) {
 
     try {
         const data = await request.json();
+        if (!data.name || data.price === undefined || data.stock === undefined) {
+            return json({ error: 'Nome, preço e estoque são obrigatórios' }, { status: 400 });
+        }
         const db = getUserDb(username);
 
         if (data.id) {
