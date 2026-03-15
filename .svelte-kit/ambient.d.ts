@@ -35,7 +35,6 @@ declare module '$env/static/private' {
 	export const npm_config_noproxy: string;
 	export const OLDPWD: string;
 	export const HOME: string;
-	export const CHROME_DESKTOP: string;
 	export const LESS: string;
 	export const DESKTOP_SESSION: string;
 	export const NVM_BIN: string;
@@ -67,7 +66,6 @@ declare module '$env/static/private' {
 	export const TERM: string;
 	export const npm_config_cache: string;
 	export const GNOME_DESKTOP_SESSION_ID: string;
-	export const FC_FONTATIONS: string;
 	export const npm_config_node_gyp: string;
 	export const PATH: string;
 	export const SESSION_MANAGER: string;
@@ -76,7 +74,6 @@ declare module '$env/static/private' {
 	export const GNOME_TERMINAL_SCREEN: string;
 	export const XDG_MENU_PREFIX: string;
 	export const GNOME_SETUP_DISPLAY: string;
-	export const GDK_BACKEND: string;
 	export const XDG_RUNTIME_DIR: string;
 	export const DISPLAY: string;
 	export const XDG_CURRENT_DESKTOP: string;
@@ -152,7 +149,6 @@ declare module '$env/dynamic/private' {
 		npm_config_noproxy: string;
 		OLDPWD: string;
 		HOME: string;
-		CHROME_DESKTOP: string;
 		LESS: string;
 		DESKTOP_SESSION: string;
 		NVM_BIN: string;
@@ -184,7 +180,6 @@ declare module '$env/dynamic/private' {
 		TERM: string;
 		npm_config_cache: string;
 		GNOME_DESKTOP_SESSION_ID: string;
-		FC_FONTATIONS: string;
 		npm_config_node_gyp: string;
 		PATH: string;
 		SESSION_MANAGER: string;
@@ -193,7 +188,6 @@ declare module '$env/dynamic/private' {
 		GNOME_TERMINAL_SCREEN: string;
 		XDG_MENU_PREFIX: string;
 		GNOME_SETUP_DISPLAY: string;
-		GDK_BACKEND: string;
 		XDG_RUNTIME_DIR: string;
 		DISPLAY: string;
 		XDG_CURRENT_DESKTOP: string;
