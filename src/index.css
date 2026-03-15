@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --color-forest: #064e3b;
+  --color-emerald-primary: #10b981;
+  --color-emerald-hover: #059669;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 font-sans;
+}
+
+.sidebar-link {
+  @apply flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-slate-300 hover:bg-forest hover:text-white;
+}
+
+.sidebar-link.active {
+  @apply bg-emerald-primary text-white;
+}

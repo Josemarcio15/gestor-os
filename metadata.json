@@ -1,0 +1,5 @@
+{
+  "name": "Gestor OS Pro",
+  "description": "Sistema completo de gestão de ordens de serviço e orçamentos com multi-tenancy SQLite.",
+  "requestFramePermissions": []
+}
