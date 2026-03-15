@@ -10,7 +10,6 @@ if (!fs.existsSync(DATA_DIR)) {
 const CENTRAL_DB_PATH = path.join(DATA_DIR, 'central_admin.db');
 const centralDb = new Database(CENTRAL_DB_PATH);
 
-// Inicializar Banco Central
 centralDb.exec(`
 	CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,7 +27,6 @@ export const getUserDb = (username: string) => {
 	const db = new Database(userDbPath);
 
 	if (!dbExists) {
-		// Aplicar Schema do Usuário
 		db.exec(`
 			CREATE TABLE IF NOT EXISTS clients (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,7 +57,7 @@ export const getUserDb = (username: string) => {
 			CREATE TABLE IF NOT EXISTS orders (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
 				client_id INTEGER NOT NULL,
-				status TEXT DEFAULT 'budget', -- budget, os, completed, cancelled
+				status TEXT DEFAULT 'budget', 
 				discount REAL DEFAULT 0,
 				total REAL DEFAULT 0,
 				notes TEXT,
@@ -70,7 +68,7 @@ export const getUserDb = (username: string) => {
 			CREATE TABLE IF NOT EXISTS order_items (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
 				order_id INTEGER NOT NULL,
-				item_type TEXT NOT NULL, -- part, service
+				item_type TEXT NOT NULL, 
 				item_id INTEGER NOT NULL,
 				description TEXT NOT NULL,
 				quantity INTEGER DEFAULT 1,

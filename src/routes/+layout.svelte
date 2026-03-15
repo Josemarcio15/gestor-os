@@ -20,7 +20,7 @@
 	const navItems = [
 		{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
 		{ href: "/clientes", label: "Clientes", icon: Users },
-		{ href: "/estoque", label: "Estoque (Peças)", icon: Package },
+		{ href: "/estoque", label: "Produtos", icon: Package },
 		{ href: "/servicos", label: "Serviços", icon: Wrench },
 		{ href: "/os", label: "Ordens de Serviço", icon: FileText },
 	];
@@ -29,13 +29,11 @@
 		isSidebarOpen = !isSidebarOpen;
 	}
 
-	// Simulação de auth para o protótipo
 	onMount(() => {
 		const storedUser = localStorage.getItem("user");
 		if (storedUser) {
 			user = JSON.parse(storedUser);
 		} else if (page.url.pathname !== "/") {
-			// window.location.href = '/';
 		}
 	});
 
@@ -46,7 +44,6 @@
 </script>
 
 <div class="min-h-screen flex flex-col md:flex-row">
-	<!-- Mobile Header -->
 	<header
 		class="md:hidden bg-forest text-white flex justify-between items-center shadow-md z-40 relative"
 	>
@@ -69,7 +66,6 @@
 		</button>
 	</header>
 
-	<!-- Sidebar -->
 	<aside
 		class="fixed inset-y-0 left-0 z-[60] w-64 bg-slate-900 text-slate-300 transform transition-transform duration-300 ease-in-out md:static md:translate-x-0 {isSidebarOpen
 			? 'translate-x-0'
@@ -131,7 +127,6 @@
 		</div>
 	</aside>
 
-	<!-- Overlay for mobile -->
 	{#if isSidebarOpen}
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -144,7 +139,6 @@
 		></div>
 	{/if}
 
-	<!-- Main Content -->
 	<main class="flex-1 p-4 md:p-8 overflow-y-auto">
 		{@render children()}
 	</main>

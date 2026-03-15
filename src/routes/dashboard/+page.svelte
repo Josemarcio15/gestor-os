@@ -89,7 +89,6 @@
 
 	function downloadBackup() {
 		if (!user) return;
-		// Rota para download do banco de dados
 		window.location.href = `/api/backup?username=${user.username}`;
 	}
 </script>

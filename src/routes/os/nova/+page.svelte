@@ -2,7 +2,6 @@
 	import { Plus, Trash2, Save, Printer, Calculator } from "lucide-svelte";
 	import { onMount } from "svelte";
 
-	// Estado usando Svelte 5 Runes
 	let clients = $state<any[]>([]);
 	let parts = $state<any[]>([]);
 	let services = $state<any[]>([]);
@@ -53,7 +52,6 @@
 		}
 	});
 
-	// Cálculos reativos
 	let subtotal = $derived(
 		items.reduce((acc, item) => acc + item.quantity * item.price, 0),
 	);
@@ -84,7 +82,6 @@
 	function handleItemSelection(item: any) {
 		const sourceList = item.type === "part" ? parts : services;
 
-		// Map the selected string name back to the DB object
 		const found = sourceList.find(
 			(i) =>
 				(item.type === "part" ? i.name : i.description) ===

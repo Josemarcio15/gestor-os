@@ -13,7 +13,6 @@
 	} from "lucide-svelte";
 	import { onMount } from "svelte";
 
-	// Estado usando Svelte 5 Runes
 	let clients = $state<any[]>([]);
 	let parts = $state<any[]>([]);
 	let services = $state<any[]>([]);
@@ -57,7 +56,6 @@
 			services = data.services;
 		}
 
-		// Load Order specific data
 		try {
 			const oRes = await fetch(`/api/os/${orderId}`, { headers });
 			if (oRes.ok) {
@@ -74,7 +72,7 @@
 					id: Math.random().toString(36).substr(2, 9),
 					item_id: i.item_id,
 					description: i.description,
-					searchQuery: i.description, // Initial search value matches description
+					searchQuery: i.description,
 					type: i.item_type,
 					quantity: i.quantity,
 					price: i.unit_price,
@@ -89,7 +87,6 @@
 		}
 	});
 
-	// Cálculos reativos
 	let subtotal = $derived(
 		items.reduce((acc, item) => acc + item.quantity * item.price, 0),
 	);
@@ -120,7 +117,6 @@
 	function handleItemSelection(item: any) {
 		const sourceList = item.type === "part" ? parts : services;
 
-		// Map the selected string name back to the DB object
 		const found = sourceList.find(
 			(i) =>
 				(item.type === "part" ? i.name : i.description) ===
@@ -156,7 +152,7 @@
 
 		try {
 			const payload = {
-				id: orderId, // Pass ID to trigger UPDATE in API
+				id: orderId,
 				client_id: clientId,
 				status: currentStatus,
 				discount: discount,
@@ -186,20 +182,15 @@
 	}
 
 	async function generatePDF() {
-		// Importação dinâmica para evitar erro de SSR
 		const { jsPDF } = await import("jspdf");
 		const doc = new jsPDF();
+		const primaryDark = [6, 78, 59];
+		const textDark = [15, 23, 42];
+		const textMuted = [100, 116, 139];
 
-		// Colors
-		const primaryDark = [6, 78, 59]; // Forest Green
-		const textDark = [15, 23, 42]; // Slate 900
-		const textMuted = [100, 116, 139]; // Slate 500
-
-		// Header Background
 		doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
 		doc.rect(0, 0, 210, 40, "F");
 
-		// Header Text
 		doc.setFontSize(22);
 		doc.setTextColor(255, 255, 255);
 		doc.setFont("helvetica", "bold");
@@ -209,7 +200,6 @@
 		doc.setFont("helvetica", "normal");
 		doc.text(`ORDEM DE SERVIÇO #${orderId}`, 190, 25, { align: "right" });
 
-		// Customer Data Section
 		doc.setTextColor(textDark[0], textDark[1], textDark[2]);
 		doc.setFontSize(10);
 		doc.setFont("helvetica", "bold");
@@ -222,7 +212,6 @@
 			align: "right",
 		});
 
-		// Table Header
 		let y = 75;
 		doc.setFillColor(248, 250, 252);
 		doc.setDrawColor(226, 232, 240);
@@ -236,7 +225,6 @@
 		doc.text("PREÇO", 155, y, { align: "right" });
 		doc.text("TOTAL", 185, y, { align: "right" });
 
-		// Table Body
 		y += 10;
 		doc.setFont("helvetica", "normal");
 		doc.setTextColor(textDark[0], textDark[1], textDark[2]);
@@ -259,14 +247,12 @@
 			y += 8;
 		});
 
-		// Calculate Summary position
 		y += 10;
 		if (y > 220) {
 			doc.addPage();
 			y = 20;
 		}
 
-		// Summary Box
 		doc.setFillColor(248, 250, 252);
 		doc.rect(120, y - 5, 75, 35, "F");
 
@@ -284,7 +270,6 @@
 		doc.text("TOTAL:", 125, y + 22);
 		doc.text(`R$ ${total.toFixed(2)}`, 185, y + 22, { align: "right" });
 
-		// Notes Section
 		if (notes && notes.trim().length > 0) {
 			y += 45;
 			if (y > 260) {
@@ -300,12 +285,10 @@
 			doc.setFont("helvetica", "normal");
 			doc.setTextColor(textDark[0], textDark[1], textDark[2]);
 
-			// Auto break text to fit page width
 			const splitNotes = doc.splitTextToSize(notes, 170);
 			doc.text(splitNotes, 20, y + 6);
 		}
 
-		// Footer
 		doc.setFontSize(8);
 		doc.setTextColor(textMuted[0], textMuted[1], textMuted[2]);
 		doc.text("Documento gerado pelo sistema Gestor OS Pro", 105, 285, {

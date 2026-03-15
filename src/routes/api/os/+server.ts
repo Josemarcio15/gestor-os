@@ -12,7 +12,6 @@ export async function GET({ request }) {
     try {
         const db = getUserDb(username);
 
-        // Join orders with clients to get the client name
         const orders = db.prepare(`
 			SELECT o.*, c.name as client 
 			FROM orders o
@@ -45,7 +44,6 @@ export async function POST({ request }) {
 				`);
                 stmt.run(orderData.client_id, orderData.status, orderData.discount, orderData.total, orderData.notes, orderId);
 
-                // Delete existing items to recreate them
                 db.prepare('DELETE FROM order_items WHERE order_id = ?').run(orderId);
             } else {
                 const stmt = db.prepare(`
@@ -56,7 +54,6 @@ export async function POST({ request }) {
                 orderId = result.lastInsertRowid;
             }
 
-            // Insert items
             if (orderData.items && Array.isArray(orderData.items)) {
                 const insertItem = db.prepare(`
 					INSERT INTO order_items (order_id, item_type, item_id, description, quantity, unit_price, total_price)
@@ -64,11 +61,10 @@ export async function POST({ request }) {
 				`);
 
                 for (const item of orderData.items) {
-                    // We use type 'part' or 'service'. item.id corresponds to parts.id or services.id
                     insertItem.run(
                         orderId,
                         item.type,
-                        item.item_id, // Important: frontend must send item_id referring to the DB item
+                        item.item_id,
                         item.description,
                         item.quantity,
                         item.price,
@@ -98,7 +94,6 @@ export async function DELETE({ request, url }) {
 
         const db = getUserDb(username);
 
-        // Run in a transaction to delete items first
         const transaction = db.transaction(() => {
             db.prepare('DELETE FROM order_items WHERE order_id = ?').run(id);
             db.prepare('DELETE FROM orders WHERE id = ?').run(id);

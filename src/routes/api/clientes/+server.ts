@@ -1,7 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { getUserDb } from '$lib/server/db';
 
-// Helper to get username from header (simple auth for this prototype)
 function getUsername(request: Request) {
     return request.headers.get('x-user-id');
 }
@@ -28,7 +27,6 @@ export async function POST({ request }) {
         const db = getUserDb(username);
 
         if (data.id) {
-            // Update existing
             const stmt = db.prepare(`
 				UPDATE clients 
 				SET name = ?, email = ?, phone = ?, document = ?
@@ -36,7 +34,6 @@ export async function POST({ request }) {
 			`);
             stmt.run(data.name, data.email, data.phone, data.document, data.id);
         } else {
-            // Create new
             const stmt = db.prepare(`
 				INSERT INTO clients (name, email, phone, document)
 				VALUES (?, ?, ?, ?)
