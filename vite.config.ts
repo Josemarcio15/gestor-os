@@ -9,5 +9,11 @@ export default defineConfig({
 		strictPort: true,
 		host: '0.0.0.0',
 		hmr: process.env.DISABLE_HMR !== 'true'
+	},
+	preview: {
+		port: 4173,
+		strictPort: true,
+		host: '0.0.0.0',
+		allowedHosts: ['os.sysmar.dev.br']
 	}
 });
