@@ -11,7 +11,7 @@ export async function GET({ request }) {
 
     try {
         const db = getUserDb(username);
-        const parts = db.prepare('SELECT * FROM parts ORDER BY name ASC').all();
+        const parts = db.prepare('SELECT * FROM parts WHERE active = 1 ORDER BY name ASC').all();
         return json({ parts });
     } catch (err) {
         return json({ error: 'Failed to fetch parts' }, { status: 500 });
@@ -62,10 +62,20 @@ export async function DELETE({ request, url }) {
         if (!id) return json({ error: 'Missing ID' }, { status: 400 });
 
         const db = getUserDb(username);
-        db.prepare('DELETE FROM parts WHERE id = ?').run(id);
 
-        return json({ success: true });
-    } catch (err) {
-        return json({ error: 'Failed to delete part' }, { status: 500 });
+
+        const result = db.prepare('UPDATE parts SET active = 0 WHERE id = ?').run(id);
+
+        if (result.changes === 0) {
+            return json({ error: 'Peça não encontrada' }, { status: 404 });
+        }
+
+        return json({ success: true, message: 'Peça desativada com sucesso' });
+    } catch (err: any) {
+        console.error("Erro ao desativar peça:", err);
+        return json({
+            error: 'Erro ao desativar peça.',
+            details: err.message
+        }, { status: 500 });
     }
 }

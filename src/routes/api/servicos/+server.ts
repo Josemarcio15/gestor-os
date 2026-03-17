@@ -11,7 +11,7 @@ export async function GET({ request }) {
 
     try {
         const db = getUserDb(username);
-        const services = db.prepare('SELECT * FROM services ORDER BY description ASC').all();
+        const services = db.prepare('SELECT * FROM services WHERE active = 1 ORDER BY description ASC').all();
         return json({ services });
     } catch (err) {
         return json({ error: 'Failed to fetch services' }, { status: 500 });
@@ -56,10 +56,19 @@ export async function DELETE({ request, url }) {
         if (!id) return json({ error: 'Missing ID' }, { status: 400 });
 
         const db = getUserDb(username);
-        db.prepare('DELETE FROM services WHERE id = ?').run(id);
 
-        return json({ success: true });
-    } catch (err) {
-        return json({ error: 'Failed to delete service' }, { status: 500 });
+        const result = db.prepare('UPDATE services SET active = 0 WHERE id = ?').run(id);
+
+        if (result.changes === 0) {
+            return json({ error: 'Serviço não encontrado' }, { status: 404 });
+        }
+
+        return json({ success: true, message: 'Serviço desativado com sucesso' });
+    } catch (err: any) {
+        console.error("Erro ao desativar serviço:", err);
+        return json({
+            error: 'Erro ao desativar serviço.',
+            details: err.message
+        }, { status: 500 });
     }
 }

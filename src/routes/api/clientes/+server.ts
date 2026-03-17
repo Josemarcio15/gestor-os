@@ -11,7 +11,7 @@ export async function GET({ request }) {
 
     try {
         const db = getUserDb(username);
-        let clients = db.prepare('SELECT * FROM clients ORDER BY name ASC').all();
+        let clients = db.prepare('SELECT * FROM clients WHERE active = 1 ORDER BY name ASC').all();
 
         clients = clients.map((c: any) => ({
             ...c,
@@ -71,10 +71,38 @@ export async function DELETE({ request, url }) {
         if (!id) return json({ error: 'Missing ID' }, { status: 400 });
 
         const db = getUserDb(username);
-        db.prepare('DELETE FROM clients WHERE id = ?').run(id);
 
-        return json({ success: true });
-    } catch (err) {
-        return json({ error: 'Failed to delete client' }, { status: 500 });
+        // Executa o Soft Delete
+        const result = db.prepare('UPDATE clients SET active = 0 WHERE id = ?').run(id);
+
+        // Verifica se algum registro foi realmente alterado (caso o ID não exista)
+        if (result.changes === 0) {
+            return json({ error: 'Cliente não encontrado' }, { status: 404 });
+        }
+
+        return json({ success: true, message: 'Cliente desativado com sucesso' });
+    } catch (err: any) {
+        // Se cair aqui, pode ser que a coluna 'active' ainda não exista no banco da VPS
+        console.error("Erro crítico no DELETE:", err);
+        return json({
+            error: 'Erro ao desativar cliente. Verifique se o banco está atualizado.',
+            details: err.message
+        }, { status: 500 });
     }
 }
+
+// export async function DELETE({ request, url }) {
+//     const username = getUsername(request);
+//     if (!username) return json({ error: 'Unauthorized' }, { status: 401 });
+
+//     try {
+//         const id = url.searchParams.get('id');
+//         if (!id) return json({ error: 'Missing ID' }, { status: 400 });
+//         const db = getUserDb(username);
+//         db.prepare('UPDATE clients SET active = 0 WHERE id = ?').run(id);
+//         return json({ success: true });
+//     } catch (err) {
+//         console.error("Erro ao desativar cliente:", err);
+//         return json({ error: 'Failed to deactivate client' }, { status: 500 });
+//     }
+// }
