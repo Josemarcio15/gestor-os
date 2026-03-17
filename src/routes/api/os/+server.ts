@@ -36,7 +36,16 @@ export async function POST({ request }) {
         const saveOrder = db.transaction((orderData) => {
             let orderId = orderData.id;
 
+            // 1. Reverter estoque se o status antigo era "completed"
             if (orderId) {
+                const oldOrder = db.prepare('SELECT status FROM orders WHERE id = ?').get(orderId) as any;
+                if (oldOrder && oldOrder.status === 'completed') {
+                    const oldItems = db.prepare("SELECT item_id, quantity FROM order_items WHERE order_id = ? AND item_type = 'part'").all(orderId) as any[];
+                    for (const item of oldItems) {
+                        db.prepare('UPDATE parts SET stock = stock + ? WHERE id = ?').run(item.quantity, item.item_id);
+                    }
+                }
+
                 const stmt = db.prepare(`
 					UPDATE orders 
 					SET client_id = ?, status = ?, discount = ?, total = ?, notes = ?
@@ -54,6 +63,7 @@ export async function POST({ request }) {
                 orderId = result.lastInsertRowid;
             }
 
+            // 2. Inserir itens e baixar estoque se o novo status for "completed"
             if (orderData.items && Array.isArray(orderData.items)) {
                 const insertItem = db.prepare(`
 					INSERT INTO order_items (order_id, item_type, item_id, description, quantity, unit_price, total_price)
@@ -70,6 +80,11 @@ export async function POST({ request }) {
                         item.price,
                         item.quantity * item.price
                     );
+
+                    // Baixa estoque se for peça e a OS estiver finalizada
+                    if (orderData.status === 'completed' && item.type === 'part' && item.item_id) {
+                        db.prepare('UPDATE parts SET stock = stock - ? WHERE id = ?').run(item.quantity, item.item_id);
+                    }
                 }
             }
             return orderId;
@@ -95,6 +110,15 @@ export async function DELETE({ request, url }) {
         const db = getUserDb(username);
 
         const transaction = db.transaction(() => {
+            // Se a OS deletada estava finalizada, devolve o estoque
+            const order = db.prepare('SELECT status FROM orders WHERE id = ?').get(id) as any;
+            if (order && order.status === 'completed') {
+                const items = db.prepare("SELECT item_id, quantity FROM order_items WHERE order_id = ? AND item_type = 'part'").all(id) as any[];
+                for (const item of items) {
+                    db.prepare('UPDATE parts SET stock = stock + ? WHERE id = ?').run(item.quantity, item.item_id);
+                }
+            }
+
             db.prepare('DELETE FROM order_items WHERE order_id = ?').run(id);
             db.prepare('DELETE FROM orders WHERE id = ?').run(id);
         });
@@ -103,6 +127,7 @@ export async function DELETE({ request, url }) {
 
         return json({ success: true });
     } catch (err) {
+        console.error("OS Delete error:", err);
         return json({ error: 'Failed to delete order' }, { status: 500 });
     }
 }
